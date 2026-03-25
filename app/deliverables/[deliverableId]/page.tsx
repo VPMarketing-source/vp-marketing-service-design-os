@@ -31,42 +31,41 @@ export default async function DeliverableDetailPage({
         eyebrow={category?.name ?? "Deliverable"}
         title={deliverable.title}
         description={deliverable.clientPromise}
-        actionHref="/manage"
-        actionLabel="Edit deliverable"
+        actionHref="/deliverables"
+        actionLabel="Back to library"
       />
 
-      <Card className="mb-6 bg-[rgba(20,26,25,0.92)] text-white">
-        <div className="flex flex-col gap-5 xl:flex-row xl:items-start xl:justify-between">
-          <div className="max-w-3xl">
-            <p className="text-xs uppercase tracking-[0.2em] text-white/50">Internal definition</p>
-            <p className="mt-3 text-sm leading-7 text-white/80">{deliverable.internalDefinition}</p>
-          </div>
-          <div className="max-w-xl">
-            <p className="text-xs uppercase tracking-[0.2em] text-white/50">Included tiers</p>
-            <div className="mt-3 flex flex-wrap gap-2">
-              {tiers.map((tier) => (
-                <Badge key={tier.id} tone="accent" className="bg-white/10 text-white">
-                  {tier.name}
-                </Badge>
-              ))}
+      <div className="grid gap-4 xl:grid-cols-[1.3fr,0.7fr]">
+        <Card className="bg-[rgba(20,26,25,0.92)] text-white">
+          <p className="text-xs uppercase tracking-[0.2em] text-white/50">Overview</p>
+          <p className="mt-3 max-w-3xl text-sm leading-7 text-white/80">{deliverable.internalDefinition}</p>
+        </Card>
+        <Card className="bg-white/75">
+          <CardTitle className="text-base">At a glance</CardTitle>
+          <div className="mt-4 space-y-3 text-sm">
+            <div className="flex items-center justify-between gap-3 rounded-2xl bg-white/70 px-4 py-3">
+              <span>Included tiers</span>
+              <span className="font-semibold">{tiers.length}</span>
             </div>
-            <p className="mt-5 text-xs uppercase tracking-[0.2em] text-white/50">Exclusions</p>
-            <ul className="mt-3 space-y-2 text-sm text-white/78">
-              {deliverable.exclusions.map((item) => (
-                <li key={item}>• {item}</li>
-              ))}
-            </ul>
+            <div className="flex items-center justify-between gap-3 rounded-2xl bg-white/70 px-4 py-3">
+              <span>Checklist items</span>
+              <span className="font-semibold">{checklistItems.length}</span>
+            </div>
+            <div className="flex items-center justify-between gap-3 rounded-2xl bg-white/70 px-4 py-3">
+              <span>SOPs</span>
+              <span className="font-semibold">{sops.length}</span>
+            </div>
           </div>
-        </div>
-      </Card>
+        </Card>
+      </div>
 
-      <Card>
+      <Card className="mt-6">
         <div className="flex items-center justify-between gap-4">
           <div>
             <CardTitle>Tier comparison</CardTitle>
-            <CardDescription className="mt-2">The hero view for comparing how this deliverable changes by package.</CardDescription>
+            <CardDescription className="mt-2">A lighter side-by-side view focused on the main differences.</CardDescription>
           </div>
-          <Badge tone="brand">Side by side</Badge>
+          <Badge tone="brand">Hero view</Badge>
         </div>
         <div className="mt-6 grid gap-4 xl:grid-cols-3">
           {tiers.map((tier) => {
@@ -88,105 +87,44 @@ export default async function DeliverableDetailPage({
                 meaning={detail.meaning}
                 cadence={detail.cadence}
                 owner={detail.owner}
-                metric={detail.successMetric}
+                output={detail.clientOutput}
                 scope={detail.scope}
-                qa={detail.qaChecklist}
               />
             );
           })}
         </div>
       </Card>
 
-      <div className="mt-6 grid gap-6 xl:grid-cols-2">
-        <Card>
-          <CardTitle>Internal tasks</CardTitle>
-          <CardDescription className="mt-2">Cross-tier execution notes grouped by package.</CardDescription>
-          <div className="mt-5 space-y-5">
-            {tiers.map((tier) => {
-              const detail = deliverable.tierDetails.find((item) => item.tierId === tier.id);
-              return (
-                <div key={tier.id} className="rounded-[24px] border border-[var(--line)] bg-white/60 p-4">
-                  <div className="flex items-center justify-between gap-4">
-                    <h3 className="font-semibold">{tier.name}</h3>
-                    <Badge tone="accent">{detail?.tools.length ?? 0} tools</Badge>
-                  </div>
-                  <ul className="mt-3 space-y-2 text-sm leading-6 text-[var(--foreground)]/85">
-                    {(detail?.internalTasks ?? []).map((task) => (
-                      <li key={task}>• {task}</li>
-                    ))}
-                  </ul>
-                  <p className="mt-4 text-xs uppercase tracking-[0.16em] text-[var(--muted)]">Inputs</p>
-                  <p className="mt-2 text-sm leading-6 text-[var(--foreground)]/85">{(detail?.inputs ?? []).join(", ") || "No inputs added."}</p>
-                  <p className="mt-4 text-xs uppercase tracking-[0.16em] text-[var(--muted)]">Client-visible output</p>
-                  <p className="mt-2 text-sm leading-6 text-[var(--foreground)]/85">{detail?.clientOutput ?? "No output defined."}</p>
-                  <p className="mt-4 text-xs uppercase tracking-[0.16em] text-[var(--muted)]">Not included</p>
-                  <ul className="mt-2 space-y-2 text-sm leading-6 text-[var(--muted)]">
-                    {(detail?.notIncluded ?? []).map((item) => (
-                      <li key={item}>• {item}</li>
-                    ))}
-                  </ul>
-                </div>
-              );
-            })}
-          </div>
-        </Card>
-
+      <div className="mt-6 grid gap-6 xl:grid-cols-[0.9fr,1.1fr]">
         <div className="space-y-6">
           <Card>
-            <CardTitle>Checklist items</CardTitle>
-            <CardDescription className="mt-2">Execution tasks linked to this deliverable.</CardDescription>
+            <CardTitle>Supporting assets</CardTitle>
+            <CardDescription className="mt-2">Open the detailed workflow only when you need it.</CardDescription>
             <div className="mt-4 space-y-3">
-              {checklistItems.length > 0 ? (
-                checklistItems.map((item) => {
-                  const tier = data.packages.find((pkg) => pkg.id === item.packageId);
-                  return (
-                    <div key={item.id} className="rounded-[22px] border border-[var(--line)] bg-white/60 p-4">
-                      <div className="flex items-center justify-between gap-3">
-                        <p className="font-semibold">{item.title}</p>
-                        <Badge tone={item.qaRequired ? "brand" : "neutral"}>{item.cadence}</Badge>
-                      </div>
-                      <p className="mt-2 text-sm leading-6 text-[var(--muted)]">{item.description}</p>
-                      <p className="mt-3 text-xs uppercase tracking-[0.16em] text-[var(--muted)]">{tier?.name} • {item.owner}</p>
-                    </div>
-                  );
-                })
-              ) : (
-                <p className="text-sm text-[var(--muted)]">No checklist items linked yet.</p>
-              )}
-            </div>
-          </Card>
-
-          <Card>
-            <CardTitle>SOPs</CardTitle>
-            <CardDescription className="mt-2">Operational playbooks attached to this deliverable.</CardDescription>
-            <div className="mt-4 space-y-3">
-              {sops.length > 0 ? (
-                sops.map((sop) => (
-                  <div key={sop.id} className="rounded-[22px] border border-[var(--line)] bg-white/60 p-4">
-                    <p className="font-semibold">{sop.title}</p>
-                    <p className="mt-2 text-sm leading-6 text-[var(--muted)]">{sop.purpose}</p>
-                    <p className="mt-3 text-xs uppercase tracking-[0.16em] text-[var(--muted)]">{sop.ownerDepartment}</p>
-                  </div>
-                ))
-              ) : (
-                <p className="text-sm text-[var(--muted)]">No SOPs linked yet.</p>
-              )}
-            </div>
-          </Card>
-
-          <Card>
-            <CardTitle>Notes and caveats</CardTitle>
-            <CardDescription className="mt-2">Quick tier-level notes.</CardDescription>
-            <div className="mt-4 space-y-3">
-              {tiers.map((tier) => {
-                const detail = deliverable.tierDetails.find((item) => item.tierId === tier.id);
-                return (
-                  <div key={tier.id} className="rounded-[22px] border border-[var(--line)] bg-white/60 p-4">
-                    <p className="font-semibold">{tier.name}</p>
-                    <p className="mt-2 text-sm leading-6 text-[var(--muted)]">{detail?.notes ?? "No notes added."}</p>
-                  </div>
-                );
-              })}
+              <div className="rounded-[22px] border border-[var(--line)] bg-white/60 p-4">
+                <div className="flex items-center justify-between gap-3">
+                  <p className="font-semibold">Checklist items</p>
+                  <Badge tone="brand">{checklistItems.length}</Badge>
+                </div>
+                <div className="mt-3 space-y-2 text-sm text-[var(--muted)]">
+                  {checklistItems.slice(0, 3).map((item) => (
+                    <p key={item.id}>{item.title}</p>
+                  ))}
+                  {checklistItems.length === 0 ? <p>No linked checklist items.</p> : null}
+                </div>
+              </div>
+              <div className="rounded-[22px] border border-[var(--line)] bg-white/60 p-4">
+                <div className="flex items-center justify-between gap-3">
+                  <p className="font-semibold">SOPs</p>
+                  <Badge tone="accent">{sops.length}</Badge>
+                </div>
+                <div className="mt-3 space-y-2 text-sm text-[var(--muted)]">
+                  {sops.slice(0, 3).map((item) => (
+                    <p key={item.id}>{item.title}</p>
+                  ))}
+                  {sops.length === 0 ? <p>No linked SOPs.</p> : null}
+                </div>
+              </div>
             </div>
             <div className="mt-5 flex flex-wrap gap-3 text-sm">
               <Link className="font-semibold text-[var(--brand)]" href="/checklists">
@@ -197,9 +135,79 @@ export default async function DeliverableDetailPage({
               </Link>
             </div>
           </Card>
+
+          <Card>
+            <CardTitle>Exclusions</CardTitle>
+            <CardDescription className="mt-2">Shared boundaries for this deliverable.</CardDescription>
+            <ul className="mt-4 space-y-2 text-sm leading-6 text-[var(--muted)]">
+              {deliverable.exclusions.map((item) => (
+                <li key={item}>- {item}</li>
+              ))}
+            </ul>
+          </Card>
         </div>
+
+        <Card>
+          <CardTitle>Detailed operational notes</CardTitle>
+          <CardDescription className="mt-2">Collapsed by default so the page stays easier to scan.</CardDescription>
+          <div className="mt-5 space-y-4">
+            {tiers.map((tier) => {
+              const detail = deliverable.tierDetails.find((item) => item.tierId === tier.id);
+              if (!detail) return null;
+
+              return (
+                <details key={tier.id} className="rounded-[24px] border border-[var(--line)] bg-white/60 p-4">
+                  <summary className="cursor-pointer list-none font-semibold">{tier.name}</summary>
+                  <div className="mt-4 grid gap-5 md:grid-cols-2 text-sm">
+                    <div>
+                      <p className="text-xs uppercase tracking-[0.16em] text-[var(--muted)]">Internal tasks</p>
+                      <ul className="mt-2 space-y-2 leading-6 text-[var(--foreground)]/85">
+                        {detail.internalTasks.map((task) => (
+                          <li key={task}>- {task}</li>
+                        ))}
+                      </ul>
+                    </div>
+                    <div>
+                      <p className="text-xs uppercase tracking-[0.16em] text-[var(--muted)]">QA checklist</p>
+                      <ul className="mt-2 space-y-2 leading-6 text-[var(--foreground)]/85">
+                        {detail.qaChecklist.map((item) => (
+                          <li key={item}>- {item}</li>
+                        ))}
+                      </ul>
+                    </div>
+                    <div>
+                      <p className="text-xs uppercase tracking-[0.16em] text-[var(--muted)]">Inputs</p>
+                      <ul className="mt-2 space-y-2 leading-6 text-[var(--foreground)]/85">
+                        {detail.inputs.map((item) => (
+                          <li key={item}>- {item}</li>
+                        ))}
+                      </ul>
+                    </div>
+                    <div>
+                      <p className="text-xs uppercase tracking-[0.16em] text-[var(--muted)]">Tools</p>
+                      <ul className="mt-2 space-y-2 leading-6 text-[var(--foreground)]/85">
+                        {detail.tools.map((item) => (
+                          <li key={item}>- {item}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
+                  <div className="mt-5 grid gap-4 md:grid-cols-2 text-sm">
+                    <div>
+                      <p className="text-xs uppercase tracking-[0.16em] text-[var(--muted)]">Success metric</p>
+                      <p className="mt-2 leading-6 text-[var(--foreground)]/85">{detail.successMetric}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs uppercase tracking-[0.16em] text-[var(--muted)]">Notes</p>
+                      <p className="mt-2 leading-6 text-[var(--foreground)]/85">{detail.notes || "No notes added."}</p>
+                    </div>
+                  </div>
+                </details>
+              );
+            })}
+          </div>
+        </Card>
       </div>
     </div>
   );
 }
-
