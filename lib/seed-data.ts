@@ -1,0 +1,569 @@
+import { ServiceDesignData } from "@/lib/types";
+
+const now = "2026-03-25T09:00:00.000Z";
+
+export const seedData: ServiceDesignData = {
+  packages: [
+    {
+      id: "revenue-foundation",
+      name: "Revenue Foundation",
+      shortLabel: "Foundation",
+      description:
+        "Foundational acquisition, conversion, retention, and reporting systems for brands that need a stable growth baseline.",
+      accent: "rgba(215,168,110,0.24)",
+      categoryIds: [
+        "acquisition",
+        "conversion",
+        "retention",
+        "tracking-optimization",
+        "support-communication",
+        "strategy-growth"
+      ],
+      updatedAt: now
+    },
+    {
+      id: "profit-optimization",
+      name: "Profit Optimization",
+      shortLabel: "Profit Optimization",
+      description:
+        "Cross-channel optimization, deeper testing, and a stronger strategy layer for brands improving efficiency and contribution margin.",
+      accent: "rgba(31,107,92,0.18)",
+      categoryIds: [
+        "acquisition",
+        "conversion",
+        "retention",
+        "tracking-optimization",
+        "support-communication",
+        "strategy-growth"
+      ],
+      updatedAt: now
+    },
+    {
+      id: "revenue-engine",
+      name: "Revenue Engine",
+      shortLabel: "Revenue Engine",
+      description:
+        "Advanced multi-platform growth ownership with deeper strategic oversight, more aggressive testing, and continuous optimization loops.",
+      accent: "rgba(91,81,168,0.18)",
+      categoryIds: [
+        "acquisition",
+        "conversion",
+        "retention",
+        "tracking-optimization",
+        "support-communication",
+        "strategy-growth"
+      ],
+      updatedAt: now
+    }
+  ],
+  categories: [
+    {
+      id: "acquisition",
+      name: "Acquisition",
+      description: "Paid media channel execution, scale systems, creative testing, and traffic quality management.",
+      updatedAt: now
+    },
+    {
+      id: "conversion",
+      name: "Conversion",
+      description: "Landing page improvement, funnel iteration, conversion rate optimization, and revenue lift opportunities.",
+      updatedAt: now
+    },
+    {
+      id: "retention",
+      name: "Retention",
+      description: "Lifecycle marketing, flows, campaigns, and retention systems that protect LTV.",
+      updatedAt: now
+    },
+    {
+      id: "tracking-optimization",
+      name: "Tracking & Optimization",
+      description: "Tracking health, performance visibility, reporting, and decision-support systems.",
+      updatedAt: now
+    },
+    {
+      id: "support-communication",
+      name: "Support & Communication",
+      description: "Cadence, support channels, and operating rhythm between the account team and client.",
+      updatedAt: now
+    },
+    {
+      id: "strategy-growth",
+      name: "Strategy & Growth",
+      description: "Growth direction, offer strategy, cross-functional planning, and strategic leadership.",
+      updatedAt: now
+    }
+  ],
+  deliverables: [
+    {
+      id: "campaign-structure-ongoing-optimization",
+      title: "Campaign structure & ongoing optimization",
+      categoryId: "acquisition",
+      shortDescription:
+        "Defines how paid media accounts are structured, maintained, and optimized across each tier.",
+      clientPromise:
+        "A clear, scalable paid media system that aligns budget, testing, and optimization with the package tier.",
+      internalDefinition:
+        "This deliverable covers campaign architecture, naming standards, budget logic, optimization cadence, reporting handoff, and role ownership for paid media delivery.",
+      includedTierIds: ["revenue-foundation", "profit-optimization", "revenue-engine"],
+      exclusions: [
+        "Landing page design work unless linked to a separate CRO deliverable",
+        "Net-new creative production outside agreed testing volumes",
+        "Call center or sales team process management"
+      ],
+      sopIds: ["sop-paid-media-build", "sop-weekly-optimization-review"],
+      checklistItemIds: [
+        "checklist-foundation-campaign-audit",
+        "checklist-foundation-weekly-optimization",
+        "checklist-profit-channel-expansion",
+        "checklist-engine-scaling-review"
+      ],
+      tierDetails: [
+        {
+          tierId: "revenue-foundation",
+          meaning:
+            "A stable single-platform media system focused on clean setup, clear naming, a sensible account structure, and a dependable weekly optimization rhythm.",
+          scope: [
+            "One ad platform only, typically Meta or Google",
+            "Initial account audit and campaign architecture recommendation",
+            "Core prospecting campaign setup with basic audience segmentation",
+            "Basic retargeting structure using existing audience pools",
+            "Budget allocation rules for core campaigns and retargeting",
+            "Weekly optimization review with monthly reporting summary"
+          ],
+          internalTasks: [
+            "Review historical account structure, conversion quality, naming consistency, and budget waste",
+            "Document recommended account map and required naming conventions",
+            "Build or rebuild core prospecting and retargeting campaigns",
+            "Check budgets, bid strategy, placements, and conversion event alignment weekly",
+            "Log changes, performance notes, and next-step recommendations in the account record",
+            "Prepare concise monthly performance summary for client-facing reporting"
+          ],
+          owner: "Media Buyer owns setup and weekly optimization, Account Manager owns client-facing summary, Strategist reviews major structural changes.",
+          cadence: "One-time setup or restructure, then weekly optimization and monthly reporting.",
+          inputs: [
+            "Client offer and target audience clarity",
+            "Approved tracking events and baseline reporting access",
+            "Existing creative assets and brand guardrails",
+            "Budget guidance and platform account access"
+          ],
+          tools: ["Meta Ads Manager or Google Ads", "GA4", "Looker Studio", "ClickUp or internal task board"],
+          clientOutput:
+            "Structured paid media account, visible optimization notes, and a monthly summary of performance shifts and next priorities.",
+          successMetric:
+            "Healthy campaign learning stability, improved CPA consistency, reduced wasted spend, and clearer visibility into what is driving results.",
+          qaChecklist: [
+            "Naming convention applied consistently across campaigns, ad sets, and ads",
+            "Conversion event mapped correctly to platform optimization goal",
+            "Prospecting and retargeting separated clearly",
+            "Budget splits align with strategy recommendation",
+            "Optimization notes recorded after each weekly review",
+            "Monthly report reflects actual changes made and current blockers"
+          ],
+          notes:
+            "Foundation should feel controlled and dependable, not overbuilt. Prioritize clarity and maintenance over aggressive expansion.",
+          notIncluded: [
+            "Second platform management",
+            "Advanced audience expansion programs",
+            "Daily optimization coverage",
+            "Complex incrementality or lift testing"
+          ]
+        },
+        {
+          tierId: "profit-optimization",
+          meaning:
+            "A multi-channel optimization layer that expands beyond baseline account hygiene into structured testing, smarter budget distribution, and stronger strategic feedback loops.",
+          scope: [
+            "Two channels, typically Meta plus Google",
+            "Cross-channel architecture with role clarity for prospecting, remarketing, and branded demand capture",
+            "Structured testing roadmap across campaign variables and creatives",
+            "Budget distribution rules by channel objective and efficiency target",
+            "More frequent optimization cadence with deeper reporting and strategy context",
+            "Integrated media insights shared into CRO and offer decisions"
+          ],
+          internalTasks: [
+            "Design account structures for both primary channels with aligned naming and reporting logic",
+            "Map channel roles so prospecting, demand capture, and retargeting do not overlap inefficiently",
+            "Build a rolling testing roadmap for audiences, creatives, placements, and campaign types",
+            "Review spend allocation multiple times per week and shift budget based on margin-aware performance",
+            "Coordinate with creative and strategy functions on which tests should be prioritized next",
+            "Prepare performance review with explanation of trends, testing outcomes, and strategic decisions"
+          ],
+          owner:
+            "Senior Media Buyer owns channel execution, Strategist owns testing roadmap and budget direction, Account Manager owns client communication, Analyst supports reporting QA.",
+          cadence: "Initial architecture design, then two to three optimization reviews per week plus structured monthly performance review.",
+          inputs: [
+            "Cross-channel budget and role definitions",
+            "Creative test backlog",
+            "Margin targets or efficiency thresholds",
+            "Tracking health confirmation and channel attribution context"
+          ],
+          tools: [
+            "Meta Ads Manager",
+            "Google Ads",
+            "GA4",
+            "Looker Studio",
+            "Northbeam, Triple Whale, or equivalent attribution layer",
+            "Internal planning board"
+          ],
+          clientOutput:
+            "A more advanced cross-channel acquisition system with visible testing logic, clearer budget decisions, and stronger monthly strategy recommendations.",
+          successMetric:
+            "Improved blended acquisition efficiency, faster learning cycles, more useful test outcomes, and stronger linkage between spend and contribution.",
+          qaChecklist: [
+            "Channel roles are clearly defined and reflected in account structure",
+            "Testing roadmap has active, upcoming, and completed experiments",
+            "Budget reallocation decisions are logged with rationale",
+            "Reporting distinguishes wins, losses, and unresolved tests",
+            "Cross-functional insights are fed back into CRO, offer, or creative work",
+            "Client recommendations match account reality and current capacity"
+          ],
+          notes:
+            "Profit Optimization is where the strategy layer becomes visible. The team should connect paid media decisions to margin, funnel quality, and business constraints.",
+          notIncluded: [
+            "Always-on daily account management across every platform",
+            "Full executive-level growth ownership",
+            "Unlimited creative production or landing page builds"
+          ]
+        },
+        {
+          tierId: "revenue-engine",
+          meaning:
+            "A high-ownership paid acquisition system built for multi-platform scaling, deeper segmentation, aggressive testing, and strategic oversight across the growth engine.",
+          scope: [
+            "Multi-platform expansion across Meta, Google, TikTok, and additional channels where justified",
+            "Advanced campaign systems segmented by audience, funnel stage, offer, and creative angle",
+            "Aggressive scaling framework with explicit spend expansion rules",
+            "Cross-platform testing model tied to creative direction and offer iteration",
+            "Deep reporting and signal synthesis across media, funnel, and retention performance",
+            "Strategic oversight of channel role design, scaling risk, and investment pacing"
+          ],
+          internalTasks: [
+            "Build channel expansion plan based on saturation, economics, and creative readiness",
+            "Design advanced campaign frameworks for scaling, including audience segmentation and feed control",
+            "Run a persistent experimentation loop across offer hooks, creatives, audience cohorts, and platform formats",
+            "Monitor account health, volatility, and scaling thresholds at a higher frequency",
+            "Coordinate insights across paid media, CRO, lifecycle, and strategy stakeholders",
+            "Lead strategic review on what to scale, pause, rebuild, or incubate next"
+          ],
+          owner:
+            "Growth Lead owns strategic direction, Channel Specialists own execution by platform, Analyst owns data QA and reporting integrity, Account Lead owns stakeholder alignment.",
+          cadence:
+            "Initial scale system design, then high-frequency optimization through the week, weekly strategic synthesis, and a deeper monthly growth review.",
+          inputs: [
+            "Channel readiness and creative production capacity",
+            "Clear economics including CAC, MER, AOV, and LTV context",
+            "Reliable attribution and event coverage",
+            "Executive priorities around growth pace, margin pressure, and launch timing"
+          ],
+          tools: [
+            "Meta Ads Manager",
+            "Google Ads",
+            "TikTok Ads Manager",
+            "GA4",
+            "Northbeam or Triple Whale",
+            "Looker Studio",
+            "Creative testing tracker",
+            "Internal strategy board"
+          ],
+          clientOutput:
+            "A multi-platform acquisition engine with visible scaling logic, stronger executive guidance, and a clearer plan for growth opportunities and risks.",
+          successMetric:
+            "Sustained revenue growth with managed efficiency, faster cross-channel experimentation, better budget deployment, and improved strategic confidence.",
+          qaChecklist: [
+            "Platform roles are documented and non-overlapping",
+            "Scaling triggers and pullback rules are defined",
+            "Segmentation logic matches funnel and offer strategy",
+            "Reporting includes leading indicators, not just lagging outcomes",
+            "Weekly strategic review identifies decisions, not just observations",
+            "Team ownership is clear for execution, analysis, QA, and client-facing synthesis"
+          ],
+          notes:
+            "Revenue Engine should feel like active growth ownership. The team is expected to interpret signals, coordinate across functions, and drive decisions proactively.",
+          notIncluded: [
+            "Creative studio production outside allocated scope",
+            "Sales floor management",
+            "Product roadmap ownership"
+          ]
+        }
+      ],
+      updatedAt: now
+    },
+    {
+      id: "creative-production-testing",
+      title: "Creative production & testing",
+      categoryId: "acquisition",
+      shortDescription: "Creative asset planning, production coordination, and testing workflow design.",
+      clientPromise: "A creative system that produces and tests the right concepts for each growth stage.",
+      internalDefinition: "Covers test planning, asset pipeline coordination, launch readiness, and learning capture.",
+      includedTierIds: ["revenue-foundation", "profit-optimization", "revenue-engine"],
+      exclusions: ["UGC sourcing management", "Full in-house creative studio"],
+      sopIds: [],
+      checklistItemIds: [],
+      tierDetails: [],
+      updatedAt: now
+    },
+    {
+      id: "ongoing-cro-funnel-optimization",
+      title: "Ongoing CRO and funnel optimization",
+      categoryId: "conversion",
+      shortDescription: "Conversion-focused improvements across landing pages, funnel steps, and purchase flow.",
+      clientPromise: "Sharper funnel performance through prioritized, data-backed conversion improvements.",
+      internalDefinition: "Covers CRO analysis, prioritization, testing direction, and implementation guidance.",
+      includedTierIds: ["profit-optimization", "revenue-engine"],
+      exclusions: ["Full website redesign"],
+      sopIds: [],
+      checklistItemIds: ["checklist-cro-opportunity-review"],
+      tierDetails: [],
+      updatedAt: now
+    },
+    {
+      id: "lifecycle-email-optimization",
+      title: "Lifecycle email optimization",
+      categoryId: "retention",
+      shortDescription: "Lifecycle flow and campaign support to improve retention performance.",
+      clientPromise: "Lifecycle systems that capture more revenue from existing traffic and customers.",
+      internalDefinition: "Defines flow setup, optimization priorities, campaign support, and retention strategy depth by tier.",
+      includedTierIds: ["revenue-foundation", "profit-optimization", "revenue-engine"],
+      exclusions: ["CRM migrations"],
+      sopIds: [],
+      checklistItemIds: [],
+      tierDetails: [],
+      updatedAt: now
+    },
+    {
+      id: "attribution-visibility-improvements",
+      title: "Attribution visibility improvements",
+      categoryId: "tracking-optimization",
+      shortDescription: "Improves reporting confidence, tracking visibility, and attribution clarity.",
+      clientPromise: "Clearer performance visibility so decisions are based on a more reliable signal set.",
+      internalDefinition: "Covers tracking review, attribution tooling, and reporting confidence improvements.",
+      includedTierIds: ["profit-optimization", "revenue-engine"],
+      exclusions: ["Warehouse architecture rebuild"],
+      sopIds: [],
+      checklistItemIds: [],
+      tierDetails: [],
+      updatedAt: now
+    },
+    {
+      id: "growth-strategy-performance-direction",
+      title: "Ongoing growth strategy & performance direction",
+      categoryId: "strategy-growth",
+      shortDescription: "Strategic guidance layer for planning, prioritization, and performance direction.",
+      clientPromise: "A clearer growth plan with sharper prioritization and stronger decision support.",
+      internalDefinition: "Defines the strategy role, planning rhythm, and decision-making support across packages.",
+      includedTierIds: ["revenue-foundation", "profit-optimization", "revenue-engine"],
+      exclusions: ["Board-level investor materials"],
+      sopIds: [],
+      checklistItemIds: [],
+      tierDetails: [],
+      updatedAt: now
+    },
+    {
+      id: "offer-messaging-optimization",
+      title: "Offer and messaging optimization",
+      categoryId: "strategy-growth",
+      shortDescription: "Improves how the offer is framed, tested, and communicated across channels and funnels.",
+      clientPromise: "Sharper messaging and offer direction that supports conversion and paid performance.",
+      internalDefinition: "Covers offer framing, messaging insights, testing direction, and coordination with creative and CRO.",
+      includedTierIds: ["profit-optimization", "revenue-engine"],
+      exclusions: ["Full brand strategy engagement"],
+      sopIds: [],
+      checklistItemIds: [],
+      tierDetails: [],
+      updatedAt: now
+    },
+    {
+      id: "full-growth-strategy-ownership",
+      title: "Full growth strategy ownership",
+      categoryId: "strategy-growth",
+      shortDescription: "Executive-level growth planning, prioritization, and proactive ownership.",
+      clientPromise: "A more embedded growth leadership layer that actively directs the next best growth moves.",
+      internalDefinition: "Captures proactive strategic ownership and cross-functional planning in Revenue Engine.",
+      includedTierIds: ["revenue-engine"],
+      exclusions: ["Internal leadership hiring"],
+      sopIds: [],
+      checklistItemIds: [],
+      tierDetails: [],
+      updatedAt: now
+    },
+    {
+      id: "funnel-builds",
+      title: "Funnel builds",
+      categoryId: "conversion",
+      shortDescription: "New funnel and landing page build work to support growth campaigns and offers.",
+      clientPromise: "New conversion paths that support launches, new offers, and better campaign economics.",
+      internalDefinition: "Defines when funnel build work is included and how it is scoped operationally.",
+      includedTierIds: ["revenue-engine"],
+      exclusions: ["Full CMS replatform"],
+      sopIds: [],
+      checklistItemIds: [],
+      tierDetails: [],
+      updatedAt: now
+    },
+    {
+      id: "email-sms-strategy",
+      title: "Email + SMS strategy",
+      categoryId: "retention",
+      shortDescription: "Retention strategy covering lifecycle flows, campaigns, and channel coordination.",
+      clientPromise: "A more coordinated retention system across email and SMS touchpoints.",
+      internalDefinition: "Defines strategy depth, campaign support, and channel coordination in higher tiers.",
+      includedTierIds: ["revenue-engine"],
+      exclusions: ["ESP migration management"],
+      sopIds: [],
+      checklistItemIds: [],
+      tierDetails: [],
+      updatedAt: now
+    },
+    {
+      id: "performance-insights-reporting-direction",
+      title: "Performance insights, reporting & strategic direction",
+      categoryId: "tracking-optimization",
+      shortDescription: "Reporting layer that turns channel data into direction, priorities, and decisions.",
+      clientPromise: "Clearer reporting and sharper direction so clients can understand what matters and what happens next.",
+      internalDefinition: "Combines reporting cadence, insight extraction, and strategic decision support.",
+      includedTierIds: ["revenue-foundation", "profit-optimization", "revenue-engine"],
+      exclusions: ["Finance forecasting ownership"],
+      sopIds: [],
+      checklistItemIds: [],
+      tierDetails: [],
+      updatedAt: now
+    }
+  ],
+  checklistItems: [
+    {
+      id: "checklist-foundation-campaign-audit",
+      title: "Run initial single-platform campaign structure audit",
+      description: "Audit campaign map, naming conventions, conversion event alignment, and wasted budget before making structural changes.",
+      packageId: "revenue-foundation",
+      deliverableId: "campaign-structure-ongoing-optimization",
+      categoryId: "acquisition",
+      owner: "Media Buyer",
+      cadence: "one-time",
+      priority: "high",
+      status: "active",
+      dependency: "Account access confirmed",
+      qaRequired: true,
+      updatedAt: now
+    },
+    {
+      id: "checklist-foundation-weekly-optimization",
+      title: "Complete weekly optimization review",
+      description: "Review spend, CPA, conversion quality, placement efficiency, audience fatigue, and active issues.",
+      packageId: "revenue-foundation",
+      deliverableId: "campaign-structure-ongoing-optimization",
+      categoryId: "acquisition",
+      owner: "Media Buyer",
+      cadence: "weekly",
+      priority: "high",
+      status: "active",
+      dependency: "Campaign structure live",
+      qaRequired: true,
+      updatedAt: now
+    },
+    {
+      id: "checklist-profit-channel-expansion",
+      title: "Review cross-channel budget distribution and testing plan",
+      description: "Evaluate channel roles, efficiency thresholds, upcoming tests, and budget shifts across Meta and Google.",
+      packageId: "profit-optimization",
+      deliverableId: "campaign-structure-ongoing-optimization",
+      categoryId: "acquisition",
+      owner: "Senior Media Buyer",
+      cadence: "bi-weekly",
+      priority: "high",
+      status: "qa",
+      dependency: "Tracking dashboard updated",
+      qaRequired: true,
+      updatedAt: now
+    },
+    {
+      id: "checklist-engine-scaling-review",
+      title: "Run weekly multi-platform scaling review",
+      description: "Assess scaling triggers, platform saturation, volatility, creative support, and next expansion decision.",
+      packageId: "revenue-engine",
+      deliverableId: "campaign-structure-ongoing-optimization",
+      categoryId: "acquisition",
+      owner: "Growth Lead",
+      cadence: "weekly",
+      priority: "critical",
+      status: "active",
+      dependency: "Executive KPI targets confirmed",
+      qaRequired: true,
+      updatedAt: now
+    },
+    {
+      id: "checklist-cro-opportunity-review",
+      title: "Review CRO opportunity backlog",
+      description: "Assess current test backlog, blocker severity, and implementation readiness.",
+      packageId: "profit-optimization",
+      deliverableId: "ongoing-cro-funnel-optimization",
+      categoryId: "conversion",
+      owner: "CRO Specialist",
+      cadence: "monthly",
+      priority: "medium",
+      status: "planned",
+      dependency: "Analytics access healthy",
+      qaRequired: false,
+      updatedAt: now
+    }
+  ],
+  sops: [
+    {
+      id: "sop-paid-media-build",
+      title: "Paid media campaign structure setup SOP",
+      categoryId: "acquisition",
+      relatedDeliverableId: "campaign-structure-ongoing-optimization",
+      ownerDepartment: "Paid Media",
+      purpose: "Ensure every account build or restructure follows a consistent architecture, naming convention, and readiness checklist.",
+      whenToUse: "Use when onboarding a new account, rebuilding campaign architecture, or restructuring after a strategic shift.",
+      steps: [
+        "Review access, conversion tracking, current structure, and recent performance data.",
+        "Map campaign architecture by objective, funnel stage, audience, and channel role.",
+        "Apply naming convention and document it in the account operating notes.",
+        "Build campaign shells, configure conversion goals, and confirm exclusions or audience overlaps.",
+        "Launch with budget rules documented and QA sign-off completed."
+      ],
+      toolsNeeded: ["Ads platform", "GA4", "Naming convention template", "Internal operating notes"],
+      qaStandard: "No build is marked complete until naming, conversion goals, exclusions, and reporting labels are reviewed by a second operator.",
+      commonMistakes: [
+        "Mixing prospecting and retargeting logic in the same campaign structure",
+        "Skipping naming standards",
+        "Launching before confirming conversion event alignment"
+      ],
+      notes: "If the platform strategy is changing materially, involve strategy before final launch.",
+      relatedChecklistItemIds: ["checklist-foundation-campaign-audit"],
+      updatedAt: now
+    },
+    {
+      id: "sop-weekly-optimization-review",
+      title: "Weekly optimization review SOP",
+      categoryId: "acquisition",
+      relatedDeliverableId: "campaign-structure-ongoing-optimization",
+      ownerDepartment: "Paid Media",
+      purpose: "Standardize how the team reviews account health, performance shifts, and priority actions each week.",
+      whenToUse: "Use for all active campaign accounts as part of the recurring optimization cycle.",
+      steps: [
+        "Review spend, conversion volume, CPA, CTR, CPM, CVR, and account volatility.",
+        "Identify top issues, winning segments, and budget allocation changes required.",
+        "Make changes according to the tier strategy and record rationale.",
+        "Update the account log with what changed, what did not, and what needs follow-up.",
+        "Escalate strategic issues to the account lead or strategist when needed."
+      ],
+      toolsNeeded: ["Ads platform", "Reporting dashboard", "Optimization checklist"],
+      qaStandard: "Each review must include logged changes, a rationale, and a clear next-step note.",
+      commonMistakes: [
+        "Making changes without logging rationale",
+        "Overreacting to short-term variance",
+        "Missing creative fatigue signals"
+      ],
+      notes: "For Revenue Engine, the review should include scaling risk and creative support readiness.",
+      relatedChecklistItemIds: [
+        "checklist-foundation-weekly-optimization",
+        "checklist-profit-channel-expansion",
+        "checklist-engine-scaling-review"
+      ],
+      updatedAt: now
+    }
+  ]
+};
+
