@@ -10,7 +10,7 @@ export const seedData: ServiceDesignData = {
       shortLabel: "Foundation",
       description:
         "Foundational acquisition, conversion, retention, and reporting systems for brands that need a stable growth baseline.",
-      accent: "rgba(215,168,110,0.24)",
+      accent: "linear-gradient(135deg, #DBEAFE 0%, #EFF6FF 100%)",
       categoryIds: [
         "acquisition",
         "conversion",
@@ -27,7 +27,7 @@ export const seedData: ServiceDesignData = {
       shortLabel: "Profit Optimization",
       description:
         "Cross-channel optimization, deeper testing, and a stronger strategy layer for brands improving efficiency and contribution margin.",
-      accent: "rgba(31,107,92,0.18)",
+      accent: "linear-gradient(135deg, #BFDBFE 0%, #DBEAFE 100%)",
       categoryIds: [
         "acquisition",
         "conversion",
@@ -44,7 +44,7 @@ export const seedData: ServiceDesignData = {
       shortLabel: "Revenue Engine",
       description:
         "Advanced multi-platform growth ownership with deeper strategic oversight, more aggressive testing, and continuous optimization loops.",
-      accent: "rgba(91,81,168,0.18)",
+      accent: "linear-gradient(135deg, #667EEA 0%, #764BA2 100%)",
       categoryIds: [
         "acquisition",
         "conversion",
@@ -566,4 +566,5 @@ export const seedData: ServiceDesignData = {
     }
   ]
 };
+
 

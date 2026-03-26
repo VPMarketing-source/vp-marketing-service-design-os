@@ -36,22 +36,22 @@ export default async function DeliverableDetailPage({
       />
 
       <div className="grid gap-4 xl:grid-cols-[1.3fr,0.7fr]">
-        <Card className="bg-[rgba(20,26,25,0.92)] text-white">
+        <Card className="border-[rgba(102,126,234,0.16)] bg-[var(--gradient-hero)] text-white shadow-[0_24px_60px_rgba(102,126,234,0.18)]">
           <p className="text-xs uppercase tracking-[0.2em] text-white/50">Overview</p>
           <p className="mt-3 max-w-3xl text-sm leading-7 text-white/80">{deliverable.internalDefinition}</p>
         </Card>
-        <Card className="bg-white/75">
+        <Card className="bg-white">
           <CardTitle className="text-base">At a glance</CardTitle>
           <div className="mt-4 space-y-3 text-sm">
-            <div className="flex items-center justify-between gap-3 rounded-2xl bg-white/70 px-4 py-3">
+            <div className="flex items-center justify-between gap-3 rounded-2xl border border-[var(--line)] bg-[var(--soft-surface)] px-4 py-3">
               <span>Included tiers</span>
               <span className="font-semibold">{tiers.length}</span>
             </div>
-            <div className="flex items-center justify-between gap-3 rounded-2xl bg-white/70 px-4 py-3">
+            <div className="flex items-center justify-between gap-3 rounded-2xl border border-[var(--line)] bg-[var(--soft-surface)] px-4 py-3">
               <span>Checklist items</span>
               <span className="font-semibold">{checklistItems.length}</span>
             </div>
-            <div className="flex items-center justify-between gap-3 rounded-2xl bg-white/70 px-4 py-3">
+            <div className="flex items-center justify-between gap-3 rounded-2xl border border-[var(--line)] bg-[var(--soft-surface)] px-4 py-3">
               <span>SOPs</span>
               <span className="font-semibold">{sops.length}</span>
             </div>
@@ -72,7 +72,7 @@ export default async function DeliverableDetailPage({
             const detail = deliverable.tierDetails.find((item) => item.tierId === tier.id);
             if (!detail) {
               return (
-                <Card key={tier.id} className="bg-white/60">
+                <Card key={tier.id} className="bg-[var(--soft-surface)]">
                   <CardTitle>{tier.name}</CardTitle>
                   <CardDescription className="mt-3">No tier-specific breakdown added yet.</CardDescription>
                 </Card>
@@ -127,10 +127,10 @@ export default async function DeliverableDetailPage({
               </div>
             </div>
             <div className="mt-5 flex flex-wrap gap-3 text-sm">
-              <Link className="font-semibold text-[var(--brand)]" href="/checklists">
+              <Link className="font-semibold text-[var(--primary-blue)]" href="/checklists">
                 View all checklists
               </Link>
-              <Link className="font-semibold text-[var(--brand)]" href="/sops">
+              <Link className="font-semibold text-[var(--primary-blue)]" href="/sops">
                 View all SOPs
               </Link>
             </div>
@@ -211,3 +211,4 @@ export default async function DeliverableDetailPage({
     </div>
   );
 }
+

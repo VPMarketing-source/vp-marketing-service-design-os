@@ -20,12 +20,12 @@ export function TierComparisonCard({
 }) {
   return (
     <Card className="h-full overflow-hidden p-0">
-      <div className="border-b border-[var(--line)] px-5 py-4" style={{ backgroundColor: accent }}>
+      <div className="border-b border-[var(--line)] px-5 py-5" style={{ background: accent }}>
         <div className="flex items-center justify-between gap-4">
           <CardTitle>{title}</CardTitle>
           <Badge tone="accent">Tier</Badge>
         </div>
-        <CardDescription className="mt-3 max-w-sm leading-6 text-[var(--foreground)]/78">{meaning}</CardDescription>
+        <CardDescription className="mt-3 max-w-sm leading-7 text-[var(--foreground)]/78">{meaning}</CardDescription>
       </div>
       <div className="space-y-5 p-5 text-sm">
         <div className="grid gap-4 sm:grid-cols-2">

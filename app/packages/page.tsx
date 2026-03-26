@@ -28,7 +28,7 @@ export default async function PackagesPage() {
 
           return (
             <Link key={pkg.id} href={`/packages/${pkg.id}`}>
-              <Card className="h-full transition hover:-translate-y-0.5 hover:bg-[rgba(255,255,255,0.95)]">
+              <Card className="h-full bg-white transition duration-200 hover:-translate-y-1 hover:border-[var(--primary-blue)]/30 hover:shadow-[0_18px_36px_rgba(37,99,235,0.12)]">
                 <div className="flex items-center justify-between gap-4">
                   <CardTitle>{pkg.name}</CardTitle>
                   <Badge tone="brand">{deliverables.length}</Badge>
@@ -36,13 +36,13 @@ export default async function PackagesPage() {
                 <CardDescription className="mt-3 leading-6">{pkg.description}</CardDescription>
                 <div className="mt-5 space-y-2">
                   {activeCategories.slice(0, 4).map((category) => (
-                    <div key={category.id} className="flex items-center justify-between rounded-2xl bg-white/60 px-3 py-2 text-sm">
+                    <div key={category.id} className="flex items-center justify-between rounded-2xl border border-[var(--line)] bg-[var(--soft-surface)] px-3 py-2 text-sm">
                       <span>{category.name}</span>
                       <span className="text-[var(--muted)]">{category.count}</span>
                     </div>
                   ))}
                 </div>
-                <p className="mt-5 text-sm font-semibold text-[var(--brand)]">Open tier view</p>
+                <p className="mt-5 text-sm font-semibold text-[var(--primary-blue)]">Open tier view</p>
               </Card>
             </Link>
           );
@@ -51,3 +51,4 @@ export default async function PackagesPage() {
     </div>
   );
 }
+

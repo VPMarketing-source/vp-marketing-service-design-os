@@ -48,9 +48,9 @@ export default async function DashboardPage() {
               const deliverableCount = data.deliverables.filter((item) => item.includedTierIds.includes(pkg.id)).length;
               return (
                 <Link key={pkg.id} href={`/packages/${pkg.id}`}>
-                  <div className="rounded-[24px] border border-[var(--line)] bg-white/70 p-5 transition hover:-translate-y-0.5 hover:bg-white">
-                    <div className="h-2 w-16 rounded-full" style={{ backgroundColor: pkg.accent }} />
-                    <h3 className="mt-4 text-lg font-semibold">{pkg.name}</h3>
+                  <div className="rounded-[20px] border border-[var(--line)] bg-[var(--soft-surface)] p-5 transition duration-200 hover:-translate-y-1 hover:border-[var(--primary-blue)]/35 hover:bg-white hover:shadow-[0_18px_36px_rgba(37,99,235,0.1)]">
+                    <div className="h-2 w-16 rounded-full" style={{ background: pkg.accent }} />
+                    <h3 className="mt-4 font-heading text-lg font-bold">{pkg.name}</h3>
                     <p className="mt-2 text-sm text-[var(--muted)]">{deliverableCount} mapped deliverables</p>
                   </div>
                 </Link>
@@ -65,7 +65,7 @@ export default async function DashboardPage() {
           <div className="mt-5 space-y-3">
             {recentItems.map((item) => (
               <Link key={`${item.type}-${item.id}`} href={item.href}>
-                <div className="rounded-[22px] border border-[var(--line)] bg-white/70 px-4 py-3 transition hover:bg-white">
+                <div className="rounded-[18px] border border-[var(--line)] bg-[var(--soft-surface)] px-4 py-3 transition duration-200 hover:-translate-y-0.5 hover:border-[var(--primary-blue)]/25 hover:bg-white">
                   <div className="flex items-center justify-between gap-4">
                     <div>
                       <p className="text-sm font-semibold">{item.title}</p>
@@ -86,7 +86,7 @@ export default async function DashboardPage() {
             <h2 className="text-2xl font-semibold">Start here</h2>
             <p className="mt-2 text-sm text-[var(--muted)]">A few key deliverables to compare first.</p>
           </div>
-          <Link className="text-sm font-semibold text-[var(--brand)]" href="/deliverables">
+          <Link className="text-sm font-semibold text-[var(--primary-blue)]" href="/deliverables">
             Open full library
           </Link>
         </div>

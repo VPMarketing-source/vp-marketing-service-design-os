@@ -70,7 +70,7 @@ export function ManageConsole({ initialData }: { initialData: ServiceDesignData 
           name: "New Package",
           shortLabel: "New Tier",
           description: "Describe the package purpose.",
-          accent: "rgba(31,107,92,0.18)",
+          accent: "linear-gradient(135deg, #dbeafe 0%, #e0ecff 100%)",
           categoryIds: data.categories.map((item) => item.id),
           updatedAt: new Date().toISOString()
         },
@@ -286,18 +286,18 @@ export function ManageConsole({ initialData }: { initialData: ServiceDesignData 
 
   return (
     <div className="space-y-6">
-      <Card className="bg-[rgba(20,26,25,0.92)] text-white">
+      <Card className="border-[rgba(102,126,234,0.16)] bg-[var(--gradient-hero)] text-white shadow-[0_24px_60px_rgba(102,126,234,0.18)]">
         <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
           <div>
             <CardTitle>Content editing studio</CardTitle>
-            <CardDescription className="mt-2 text-white/70">Edit the local JSON-backed operating system without auth or external services.</CardDescription>
+            <CardDescription className="mt-2 text-white/78">Edit the local JSON-backed operating system without auth or external services.</CardDescription>
           </div>
           <div className="flex flex-wrap gap-3">
-            <Button variant="secondary" className="bg-white/10 text-white hover:bg-white/15" onClick={deleteCurrent}>Delete selected</Button>
+            <Button variant="secondary" className="border-white/20 bg-white/10 text-white hover:bg-white/18" onClick={deleteCurrent}>Delete selected</Button>
             <Button onClick={saveAll} disabled={isPending}>Save all changes</Button>
           </div>
         </div>
-        <p className="mt-4 text-sm text-white/70">{message || "Choose a section, edit records, then save to write into data/service-design.json."}</p>
+        <p className="mt-4 text-sm text-white/78">{message || "Choose a section, edit records, then save to write into data/service-design.json."}</p>
       </Card>
 
       <div className="flex flex-wrap gap-2">
@@ -314,7 +314,7 @@ export function ManageConsole({ initialData }: { initialData: ServiceDesignData 
             <div className="flex items-center justify-between"><CardTitle>Packages</CardTitle><Button onClick={addPackage}>Add</Button></div>
             <div className="mt-4 space-y-2">
               {data.packages.map((item) => (
-                <button key={item.id} className="w-full rounded-2xl border border-[var(--line)] bg-white/60 px-4 py-3 text-left" onClick={() => setSelectedPackageId(item.id)}>{item.name}</button>
+                <button key={item.id} className="w-full rounded-2xl border border-[var(--line)] bg-[var(--soft-surface)] px-4 py-3 text-left" onClick={() => setSelectedPackageId(item.id)}>{item.name}</button>
               ))}
             </div>
           </Card>
@@ -336,7 +336,7 @@ export function ManageConsole({ initialData }: { initialData: ServiceDesignData 
                   {data.categories.map((category) => {
                     const checked = selectedPackage.categoryIds.includes(category.id);
                     return (
-                      <label key={category.id} className="flex items-center gap-2 rounded-2xl border border-[var(--line)] bg-white/60 px-3 py-2 text-sm">
+                      <label key={category.id} className="flex items-center gap-2 rounded-2xl border border-[var(--line)] bg-[var(--soft-surface)] px-3 py-2 text-sm">
                         <input
                           type="checkbox"
                           checked={checked}
@@ -366,7 +366,7 @@ export function ManageConsole({ initialData }: { initialData: ServiceDesignData 
             <div className="flex items-center justify-between"><CardTitle>Categories</CardTitle><Button onClick={addCategory}>Add</Button></div>
             <div className="mt-4 space-y-2">
               {data.categories.map((item) => (
-                <button key={item.id} className="w-full rounded-2xl border border-[var(--line)] bg-white/60 px-4 py-3 text-left" onClick={() => setSelectedCategoryId(item.id)}>{item.name}</button>
+                <button key={item.id} className="w-full rounded-2xl border border-[var(--line)] bg-[var(--soft-surface)] px-4 py-3 text-left" onClick={() => setSelectedCategoryId(item.id)}>{item.name}</button>
               ))}
             </div>
           </Card>
@@ -391,7 +391,7 @@ export function ManageConsole({ initialData }: { initialData: ServiceDesignData 
             <div className="flex items-center justify-between"><CardTitle>Deliverables</CardTitle><Button onClick={addDeliverable}>Add</Button></div>
             <div className="mt-4 space-y-2 max-h-[70vh] overflow-auto pr-1">
               {data.deliverables.map((item) => (
-                <button key={item.id} className="w-full rounded-2xl border border-[var(--line)] bg-white/60 px-4 py-3 text-left" onClick={() => setSelectedDeliverableId(item.id)}>{item.title}</button>
+                <button key={item.id} className="w-full rounded-2xl border border-[var(--line)] bg-[var(--soft-surface)] px-4 py-3 text-left" onClick={() => setSelectedDeliverableId(item.id)}>{item.title}</button>
               ))}
             </div>
           </Card>
@@ -417,7 +417,7 @@ export function ManageConsole({ initialData }: { initialData: ServiceDesignData 
                 {data.packages.map((pkg) => {
                   const checked = selectedDeliverable.includedTierIds.includes(pkg.id);
                   return (
-                    <label key={pkg.id} className="flex items-center gap-2 rounded-2xl border border-[var(--line)] bg-white/60 px-3 py-2 text-sm">
+                    <label key={pkg.id} className="flex items-center gap-2 rounded-2xl border border-[var(--line)] bg-[var(--soft-surface)] px-3 py-2 text-sm">
                       <input
                         type="checkbox"
                         checked={checked}
@@ -454,7 +454,7 @@ export function ManageConsole({ initialData }: { initialData: ServiceDesignData 
                   notIncluded: []
                 };
                 return (
-                  <div key={pkg.id} className="rounded-[28px] border border-[var(--line)] bg-white/60 p-5">
+                  <div key={pkg.id} className="rounded-[28px] border border-[var(--line)] bg-[var(--soft-surface)] p-5">
                     <p className="text-lg font-semibold">{pkg.name}</p>
                     <div className="mt-4 space-y-4">
                       <Textarea value={detail.meaning} onChange={(e) => updateTierDetail(pkg.id, "meaning", e.target.value)} placeholder="What this deliverable means at this tier" />
@@ -494,7 +494,7 @@ export function ManageConsole({ initialData }: { initialData: ServiceDesignData 
             <div className="flex items-center justify-between"><CardTitle>Checklist items</CardTitle><Button onClick={addChecklist}>Add</Button></div>
             <div className="mt-4 space-y-2 max-h-[70vh] overflow-auto pr-1">
               {data.checklistItems.map((item) => (
-                <button key={item.id} className="w-full rounded-2xl border border-[var(--line)] bg-white/60 px-4 py-3 text-left" onClick={() => setSelectedChecklistId(item.id)}>{item.title}</button>
+                <button key={item.id} className="w-full rounded-2xl border border-[var(--line)] bg-[var(--soft-surface)] px-4 py-3 text-left" onClick={() => setSelectedChecklistId(item.id)}>{item.title}</button>
               ))}
             </div>
           </Card>
@@ -535,7 +535,7 @@ export function ManageConsole({ initialData }: { initialData: ServiceDesignData 
             <div className="flex items-center justify-between"><CardTitle>SOPs</CardTitle><Button onClick={addSop}>Add</Button></div>
             <div className="mt-4 space-y-2 max-h-[70vh] overflow-auto pr-1">
               {data.sops.map((item) => (
-                <button key={item.id} className="w-full rounded-2xl border border-[var(--line)] bg-white/60 px-4 py-3 text-left" onClick={() => setSelectedSopId(item.id)}>{item.title}</button>
+                <button key={item.id} className="w-full rounded-2xl border border-[var(--line)] bg-[var(--soft-surface)] px-4 py-3 text-left" onClick={() => setSelectedSopId(item.id)}>{item.title}</button>
               ))}
             </div>
           </Card>
@@ -565,5 +565,7 @@ export function ManageConsole({ initialData }: { initialData: ServiceDesignData 
     </div>
   );
 }
+
+
 
 
