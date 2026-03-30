@@ -18,10 +18,17 @@ type DeliverableTask = {
   role: string;
 };
 
+type DeliverableCadenceGroup = {
+  id: string;
+  label: string;
+  tasks: DeliverableTask[];
+};
+
 type DeliverableItem = {
   id: string;
   title: string;
-  tasks: DeliverableTask[];
+  tasks?: DeliverableTask[];
+  cadenceGroups?: DeliverableCadenceGroup[];
 };
 
 type DeliverableSection = {
@@ -56,6 +63,14 @@ function buildTasks(deliverableId: string, tasks: Array<[string, string]>) {
   }));
 }
 
+function buildCadenceGroups(deliverableId: string, groups: Array<[string, Array<[string, string]>]>) {
+  return groups.map(([label, tasks], index) => ({
+    id: `${deliverableId}-cadence-${index}`,
+    label,
+    tasks: buildTasks(`${deliverableId}-cadence-${index}`, tasks)
+  }));
+}
+
 const diagnosticCallSections: ContentSection[] = [
   { id: "pre-call", title: "Pre-Call", description: "Review the business before the call." },
   { id: "on-the-call", title: "On the Call", description: "Understand their goals and problems." },
@@ -85,12 +100,27 @@ const foundationDeliverableSections: DeliverableSection[] = [
       {
         id: "platform-management",
         title: "Platform Management (Meta or Google)",
-        tasks: buildTasks("platform-management", [
-          ["Review account daily", "Media Buyer"],
-          ["Monitor spend and performance", "Media Buyer"],
-          ["Adjust budgets", "Media Buyer"],
-          ["Pause weak ads", "Media Buyer"],
-          ["Scale stable winners", "Media Buyer"]
+        cadenceGroups: buildCadenceGroups("platform-management", [
+          ["Daily", [
+            ["Review account performance", "Media Buyer"],
+            ["Monitor spend pacing", "Media Buyer"],
+            ["Adjust campaign budgets", "Media Buyer"],
+            ["Pause underperforming ads/ad sets", "Media Buyer"],
+            ["Scale winning ads within safe limits", "Media Buyer"]
+          ]],
+          ["Weekly", [
+            ["Review campaign performance trends", "Media Buyer"],
+            ["Identify top and worst performing ads", "Media Buyer"],
+            ["Analyze audience performance", "Media Buyer"],
+            ["Launch new creative tests", "Media Buyer"],
+            ["Refresh underperforming ads/ad sets", "Media Buyer"]
+          ]],
+          ["Monthly", [
+            ["Review overall account performance", "Media Buyer"],
+            ["Identify performance bottlenecks", "Media Buyer"],
+            ["Reallocate budget across campaigns", "Media Buyer"],
+            ["Define next month's testing priorities", "Media Buyer"]
+          ]]
         ])
       },
       {
@@ -256,10 +286,28 @@ const growthDeliverableSections: DeliverableSection[] = [
       {
         id: "platform-management",
         title: "Platform Management (Meta + Google)",
-        tasks: buildTasks("platform-management", [
-          ["Manage both channels together", "Media Buyer"],
-          ["Compare performance by platform", "Media Buyer"],
-          ["Reallocate budget toward strongest opportunities", "Media Buyer"]
+        cadenceGroups: buildCadenceGroups("platform-management", [
+          ["Daily", [
+            ["Review performance across both platforms", "Media Buyer"],
+            ["Monitor spend pacing across channels", "Media Buyer"],
+            ["Adjust budgets based on performance", "Media Buyer"],
+            ["Pause underperforming ads/ad sets", "Media Buyer"],
+            ["Scale winning campaigns", "Media Buyer"]
+          ]],
+          ["Weekly", [
+            ["Compare performance by platform", "Media Buyer"],
+            ["Identify strongest channel opportunities", "Media Buyer"],
+            ["Analyze creative performance trends", "Media Buyer"],
+            ["Analyze audience performance", "Media Buyer"],
+            ["Launch structured tests", "Media Buyer"],
+            ["Refresh underperforming campaigns", "Media Buyer"]
+          ]],
+          ["Monthly", [
+            ["Review cross-channel performance trends", "Media Buyer"],
+            ["Identify scaling opportunities by platform", "Media Buyer"],
+            ["Reallocate budget toward best-performing channel", "Media Buyer"],
+            ["Refine testing roadmap", "Media Buyer"]
+          ]]
         ])
       },
       {
@@ -480,10 +528,29 @@ const scaleDeliverableSections: DeliverableSection[] = [
       {
         id: "platform-management",
         title: "Platform Management (Meta, Google, TikTok)",
-        tasks: buildTasks("platform-management", [
-          ["Manage all core paid platforms", "Media Buyer"],
-          ["Compare channel efficiency", "Media Buyer"],
-          ["Balance budget across strongest opportunities", "Media Buyer"]
+        cadenceGroups: buildCadenceGroups("platform-management", [
+          ["Daily", [
+            ["Review performance across all platforms", "Media Buyer"],
+            ["Monitor spend distribution", "Media Buyer"],
+            ["Adjust budgets dynamically", "Media Buyer"],
+            ["Pause underperforming segments", "Media Buyer"],
+            ["Scale winning campaigns aggressively", "Media Buyer"]
+          ]],
+          ["Weekly", [
+            ["Compare channel efficiency", "Media Buyer"],
+            ["Identify scaling opportunities across platforms", "Media Buyer"],
+            ["Analyze creative fatigue", "Media Buyer"],
+            ["Review audience segmentation performance", "Media Buyer"],
+            ["Launch advanced testing", "Media Buyer"],
+            ["Refresh and iterate campaigns", "Media Buyer"]
+          ]],
+          ["Monthly", [
+            ["Review blended acquisition performance", "Media Buyer"],
+            ["Identify scaling constraints", "Media Buyer"],
+            ["Reallocate budget across platforms", "Media Buyer"],
+            ["Plan expansion opportunities", "Media Buyer"],
+            ["Update growth roadmap", "Media Buyer"]
+          ]]
         ])
       },
       {
@@ -748,6 +815,7 @@ export function SalesProcessWorkspace() {
   const [activeItemId, setActiveItemId] = useState(defaultItemId);
   const [openSections, setOpenSections] = useState<Record<string, boolean>>({});
   const [openDeliverables, setOpenDeliverables] = useState<Record<string, boolean>>({});
+  const [openCadenceGroups, setOpenCadenceGroups] = useState<Record<string, boolean>>({});
 
   const activeRecord = useMemo(() => {
     for (const item of genericProcessItems) {
@@ -788,6 +856,10 @@ export function SalesProcessWorkspace() {
 
   function toggleDeliverable(deliverableKey: string) {
     setOpenDeliverables((current) => ({ ...current, [deliverableKey]: !current[deliverableKey] }));
+  }
+
+  function toggleCadenceGroup(cadenceKey: string) {
+    setOpenCadenceGroups((current) => ({ ...current, [cadenceKey]: !current[cadenceKey] }));
   }
 
   return (
@@ -853,14 +925,44 @@ export function SalesProcessWorkspace() {
 
                                     {deliverableOpen ? (
                                       <div className="border-t border-zinc-200 px-3.5 py-2.5">
-                                        <div className="space-y-2.5">
-                                          {deliverable.tasks.map((task) => (
-                                            <div className="flex flex-col gap-0.5 border-l border-zinc-200 pl-3 sm:flex-row sm:items-start sm:justify-between" key={task.id}>
-                                              <p className="text-[12px] text-zinc-700">{task.title}</p>
-                                              <p className="text-[11px] text-zinc-500">{task.role}</p>
-                                            </div>
-                                          ))}
-                                        </div>
+                                        {deliverable.cadenceGroups?.length ? (
+                                          <div className="space-y-2">
+                                            {deliverable.cadenceGroups.map((cadenceGroup) => {
+                                              const cadenceKey = `${deliverableKey}-${cadenceGroup.id}`;
+                                              const cadenceOpen = Boolean(openCadenceGroups[cadenceKey]);
+                                              return (
+                                                <div className="rounded-md border border-zinc-200 bg-white" key={cadenceGroup.id}>
+                                                  <button className="flex w-full items-center justify-between px-3 py-2 text-left" onClick={() => toggleCadenceGroup(cadenceKey)} type="button">
+                                                    <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-zinc-600">{cadenceGroup.label}</span>
+                                                    <span className="text-xs text-zinc-500">{cadenceOpen ? "Hide" : "Open"}</span>
+                                                  </button>
+
+                                                  {cadenceOpen ? (
+                                                    <div className="border-t border-zinc-200 px-3 py-2.5">
+                                                      <div className="space-y-2.5">
+                                                        {cadenceGroup.tasks.map((task) => (
+                                                          <div className="flex flex-col gap-0.5 border-l border-zinc-200 pl-3 sm:flex-row sm:items-start sm:justify-between" key={task.id}>
+                                                            <p className="text-[12px] text-zinc-700">{task.title}</p>
+                                                            <p className="text-[11px] text-zinc-500">{task.role}</p>
+                                                          </div>
+                                                        ))}
+                                                      </div>
+                                                    </div>
+                                                  ) : null}
+                                                </div>
+                                              );
+                                            })}
+                                          </div>
+                                        ) : (
+                                          <div className="space-y-2.5">
+                                            {deliverable.tasks?.map((task) => (
+                                              <div className="flex flex-col gap-0.5 border-l border-zinc-200 pl-3 sm:flex-row sm:items-start sm:justify-between" key={task.id}>
+                                                <p className="text-[12px] text-zinc-700">{task.title}</p>
+                                                <p className="text-[11px] text-zinc-500">{task.role}</p>
+                                              </div>
+                                            ))}
+                                          </div>
+                                        )}
                                       </div>
                                     ) : null}
                                   </div>
@@ -881,7 +983,6 @@ export function SalesProcessWorkspace() {
     </div>
   );
 }
-
 
 
 
