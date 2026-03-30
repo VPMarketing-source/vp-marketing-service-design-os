@@ -1,17 +1,17 @@
-"use client";
+﻿"use client";
 
 import Link from "next/link";
-import { useDeferredValue, useEffect, useMemo, useState } from "react";
-import { Search, ShieldCheck, Sparkles } from "lucide-react";
+import { startTransition, useDeferredValue, useEffect, useMemo, useState } from "react";
 
+import { DeliverableGroup } from "@/components/app/deliverable-group";
+import { ProgressBar } from "@/components/app/progress-bar";
+import { SectionBlock } from "@/components/app/section-block";
+import { WorkflowSidebar } from "@/components/app/sidebar";
 import { SopCard, type WorkflowSop, type WorkflowTask } from "@/components/app/sop-card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Card, CardDescription, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import { PackageTier, ServiceDesignData } from "@/lib/types";
-import { cn } from "@/lib/utils";
 
 type PersistedTaskState = {
   checked?: boolean;
@@ -19,7 +19,7 @@ type PersistedTaskState = {
   subtasks?: Record<string, boolean>;
 };
 
-type DeliverableGroup = {
+type DeliverableGroupData = {
   id: string;
   title: string;
   description: string;
@@ -36,7 +36,7 @@ type SectionGroup = {
   progress: number;
   completedCount: number;
   totalCount: number;
-  deliverables: DeliverableGroup[];
+  deliverables: DeliverableGroupData[];
 };
 
 function getStorageKey(packageId: string) {
@@ -84,7 +84,7 @@ function getTaskCounts(tasks: WorkflowTask[], state: Record<string, PersistedTas
   );
 }
 
-function getProgressFromCounts(completedCount: number, totalCount: number) {
+function getProgress(completedCount: number, totalCount: number) {
   if (totalCount === 0) {
     return 0;
   }
@@ -92,21 +92,42 @@ function getProgressFromCounts(completedCount: number, totalCount: number) {
   return clampProgress((completedCount / totalCount) * 100);
 }
 
+function getFirstIncompleteTask(sections: SectionGroup[], taskState: Record<string, PersistedTaskState>) {
+  for (const section of sections) {
+    for (const deliverable of section.deliverables) {
+      for (const sop of deliverable.sops) {
+        for (const task of [...sop.steps, ...sop.checkpoints]) {
+          if (!taskState[task.id]?.checked) {
+            return { sopId: sop.id, taskId: task.id, sectionId: section.id };
+          }
+
+          for (const subtask of task.subtasks ?? []) {
+            if (!taskState[task.id]?.subtasks?.[subtask.id]) {
+              return { sopId: sop.id, taskId: task.id, sectionId: section.id };
+            }
+          }
+        }
+      }
+    }
+  }
+
+  return null;
+}
+
 export function PackageWorkspace({ data, pkg }: { data: ServiceDesignData; pkg: PackageTier }) {
   const [search, setSearch] = useState("");
   const [roleFilter, setRoleFilter] = useState("all");
-  const [expanded, setExpanded] = useState<Record<string, boolean>>({});
+  const [activeSectionId, setActiveSectionId] = useState<string>();
+  const [expandedSopId, setExpandedSopId] = useState<string>();
   const [taskState, setTaskState] = useState<Record<string, PersistedTaskState>>({});
   const deferredSearch = useDeferredValue(search);
 
   useEffect(() => {
     try {
       const raw = window.localStorage.getItem(getStorageKey(pkg.id));
-      if (!raw) {
-        return;
+      if (raw) {
+        setTaskState(JSON.parse(raw) as Record<string, PersistedTaskState>);
       }
-
-      setTaskState(JSON.parse(raw) as Record<string, PersistedTaskState>);
     } catch {
       setTaskState({});
     }
@@ -125,8 +146,7 @@ export function PackageWorkspace({ data, pkg }: { data: ServiceDesignData; pkg: 
     const roles = new Set<string>();
 
     for (const sop of data.sops) {
-      const deliverable = packageDeliverables.find((item) => item.id === sop.relatedDeliverableId);
-      if (deliverable) {
+      if (packageDeliverables.some((deliverable) => deliverable.id === sop.relatedDeliverableId)) {
         roles.add(sop.ownerDepartment);
       }
     }
@@ -134,7 +154,7 @@ export function PackageWorkspace({ data, pkg }: { data: ServiceDesignData; pkg: 
     return Array.from(roles).sort((left, right) => left.localeCompare(right));
   }, [data.sops, packageDeliverables]);
 
-  const allSections = useMemo<SectionGroup[]>(() => {
+  const sections = useMemo<SectionGroup[]>(() => {
     return data.categories
       .filter((category) => pkg.categoryIds.includes(category.id))
       .map((category) => {
@@ -144,6 +164,12 @@ export function PackageWorkspace({ data, pkg }: { data: ServiceDesignData; pkg: 
             const sops = data.sops
               .filter((sop) => sop.relatedDeliverableId === deliverable.id)
               .map((sop) => {
+                const steps = sop.steps.map<WorkflowTask>((step, index) => ({
+                  id: `${sop.id}::step::${index}`,
+                  title: `Step ${index + 1}`,
+                  description: step
+                }));
+
                 const checkpoints = data.checklistItems
                   .filter((item) => sop.relatedChecklistItemIds.includes(item.id))
                   .map<WorkflowTask>((item) => ({
@@ -152,12 +178,6 @@ export function PackageWorkspace({ data, pkg }: { data: ServiceDesignData; pkg: 
                     description: item.description,
                     subtasks: buildCheckpointSubtasks(item.qaRequired, item.dependency, item.cadence)
                   }));
-
-                const steps = sop.steps.map<WorkflowTask>((step, index) => ({
-                  id: `${sop.id}::step::${index}`,
-                  title: `Step ${index + 1}`,
-                  description: step
-                }));
 
                 const stepCounts = getTaskCounts(steps, taskState);
                 const checkpointCounts = getTaskCounts(checkpoints, taskState);
@@ -168,12 +188,12 @@ export function PackageWorkspace({ data, pkg }: { data: ServiceDesignData; pkg: 
                   id: sop.id,
                   title: sop.title,
                   role: sop.ownerDepartment,
-                  estimatedMinutes: Math.max(15, sop.steps.length * 12 + checkpoints.length * 8),
+                  estimatedMinutes: Math.max(15, sop.steps.length * 10 + checkpoints.length * 8),
                   purpose: sop.purpose,
                   whenToUse: sop.whenToUse,
                   deliverableTitle: deliverable.title,
                   categoryName: category.name,
-                  progress: getProgressFromCounts(completedCount, totalCount),
+                  progress: getProgress(completedCount, totalCount),
                   completedCount,
                   totalCount,
                   steps,
@@ -190,11 +210,11 @@ export function PackageWorkspace({ data, pkg }: { data: ServiceDesignData; pkg: 
               id: deliverable.id,
               title: deliverable.title,
               description: deliverable.shortDescription,
-              progress: getProgressFromCounts(completedCount, totalCount),
+              progress: getProgress(completedCount, totalCount),
               completedCount,
               totalCount,
               sops
-            } satisfies DeliverableGroup;
+            } satisfies DeliverableGroupData;
           });
 
         const completedCount = deliverables.reduce((sum, deliverable) => sum + deliverable.completedCount, 0);
@@ -204,7 +224,7 @@ export function PackageWorkspace({ data, pkg }: { data: ServiceDesignData; pkg: 
           id: category.id,
           name: category.name,
           description: category.description,
-          progress: getProgressFromCounts(completedCount, totalCount),
+          progress: getProgress(completedCount, totalCount),
           completedCount,
           totalCount,
           deliverables
@@ -216,7 +236,7 @@ export function PackageWorkspace({ data, pkg }: { data: ServiceDesignData; pkg: 
   const visibleSections = useMemo(() => {
     const query = deferredSearch.trim().toLowerCase();
 
-    return allSections
+    return sections
       .map((section) => {
         const deliverables = section.deliverables
           .map((deliverable) => {
@@ -224,52 +244,79 @@ export function PackageWorkspace({ data, pkg }: { data: ServiceDesignData; pkg: 
               const roleMatches = roleFilter === "all" || sop.role === roleFilter;
               const queryMatches =
                 query.length === 0 ||
-                [sop.title, sop.purpose, sop.whenToUse, sop.deliverableTitle, sop.categoryName]
+                [sop.title, sop.whenToUse, sop.deliverableTitle, sop.categoryName]
                   .join(" ")
                   .toLowerCase()
                   .includes(query);
-
               return roleMatches && queryMatches;
             });
 
-            if (query.length > 0 && sops.length === 0) {
+            if (sops.length === 0) {
               return null;
             }
 
-            if (roleFilter !== "all" && sops.length === 0) {
-              return null;
-            }
-
-            return {
-              ...deliverable,
-              sops
-            };
+            return { ...deliverable, sops };
           })
-          .filter((deliverable): deliverable is DeliverableGroup => Boolean(deliverable));
+          .filter((deliverable): deliverable is DeliverableGroupData => Boolean(deliverable));
 
         if (deliverables.length === 0) {
           return null;
         }
 
-        return {
-          ...section,
-          deliverables
-        };
+        return { ...section, deliverables };
       })
       .filter((section): section is SectionGroup => Boolean(section));
-  }, [allSections, deferredSearch, roleFilter]);
+  }, [deferredSearch, roleFilter, sections]);
 
-  const packageCompletedCount = allSections.reduce((sum, section) => sum + section.completedCount, 0);
-  const packageTotalCount = allSections.reduce((sum, section) => sum + section.totalCount, 0);
-  const packageProgress = getProgressFromCounts(packageCompletedCount, packageTotalCount);
-  const sopCount = allSections.reduce((sum, section) => sum + section.deliverables.reduce((subtotal, deliverable) => subtotal + deliverable.sops.length, 0), 0);
+  const packageCompletedCount = sections.reduce((sum, section) => sum + section.completedCount, 0);
+  const packageTotalCount = sections.reduce((sum, section) => sum + section.totalCount, 0);
+  const packageProgress = getProgress(packageCompletedCount, packageTotalCount);
 
-  function toggleExpanded(sopId: string) {
-    setExpanded((current) => ({
-      ...current,
-      [sopId]: !current[sopId]
-    }));
-  }
+  useEffect(() => {
+    if (visibleSections.length === 0) {
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visible = entries
+          .filter((entry) => entry.isIntersecting)
+          .sort((left, right) => right.intersectionRatio - left.intersectionRatio)[0];
+
+        if (visible?.target.id) {
+          setActiveSectionId(visible.target.id.replace("section-", ""));
+        }
+      },
+      { rootMargin: "-25% 0px -55% 0px", threshold: [0.1, 0.35, 0.6] }
+    );
+
+    const sectionEls = visibleSections
+      .map((section) => document.getElementById(`section-${section.id}`))
+      .filter((element): element is HTMLElement => Boolean(element));
+
+    sectionEls.forEach((element) => observer.observe(element));
+    setActiveSectionId((current) => current ?? visibleSections[0]?.id);
+
+    return () => observer.disconnect();
+  }, [visibleSections]);
+
+  useEffect(() => {
+    const firstIncomplete = getFirstIncompleteTask(sections, taskState);
+    if (!firstIncomplete || expandedSopId) {
+      return;
+    }
+
+    startTransition(() => {
+      setExpandedSopId(firstIncomplete.sopId);
+      setActiveSectionId(firstIncomplete.sectionId);
+    });
+
+    const timeout = window.setTimeout(() => {
+      document.getElementById(`task-${firstIncomplete.taskId}`)?.scrollIntoView({ behavior: "smooth", block: "center" });
+    }, 150);
+
+    return () => window.clearTimeout(timeout);
+  }, [expandedSopId, sections, taskState]);
 
   function updateTask(taskId: string, patch: PersistedTaskState) {
     setTaskState((current) => ({
@@ -302,173 +349,83 @@ export function PackageWorkspace({ data, pkg }: { data: ServiceDesignData; pkg: 
     }));
   }
 
+  function toggleExpanded(sopId: string) {
+    setExpandedSopId((current) => (current === sopId ? undefined : sopId));
+  }
+
   return (
-    <div className="space-y-6">
-      <div className="grid gap-4 lg:grid-cols-3">
-        <Card className="bg-white">
-          <CardDescription className="uppercase tracking-[0.18em]">Package progress</CardDescription>
-          <CardTitle className="mt-3 text-3xl">{packageProgress}%</CardTitle>
-          <div className="mt-4 h-2 rounded-full bg-[var(--soft-surface-deep)]">
-            <div className="h-2 rounded-full bg-[var(--primary-blue)]" style={{ width: `${packageProgress}%` }} />
-          </div>
-          <p className="mt-3 text-sm text-[var(--muted)]">{packageCompletedCount} of {packageTotalCount} tasks complete across this package.</p>
-        </Card>
-        <Card className="bg-white">
-          <CardDescription className="uppercase tracking-[0.18em]">Deliverables</CardDescription>
-          <CardTitle className="mt-3 text-3xl">{packageDeliverables.length}</CardTitle>
-          <p className="mt-3 text-sm text-[var(--muted)]">Grouped across {allSections.length} operational sections.</p>
-        </Card>
-        <Card className="bg-white">
-          <CardDescription className="uppercase tracking-[0.18em]">SOP coverage</CardDescription>
-          <CardTitle className="mt-3 text-3xl">{sopCount}</CardTitle>
-          <p className="mt-3 text-sm text-[var(--muted)]">Each SOP tracks per-user progress locally for execution and notes.</p>
-        </Card>
-      </div>
+    <div className="grid gap-6 xl:grid-cols-[280px,minmax(0,1fr)]">
+      <aside className="xl:sticky xl:top-24 xl:self-start">
+        <WorkflowSidebar
+          activeSectionId={activeSectionId}
+          packages={data.packages.map((item) => ({
+            id: item.id,
+            label: item.name,
+            href: `/packages/${item.id}`,
+            active: item.id === pkg.id
+          }))}
+          sections={visibleSections.map((section) => ({ id: section.id, label: section.name, progress: section.progress }))}
+        />
+      </aside>
 
-      <div className="grid gap-6 xl:grid-cols-[280px,minmax(0,1fr)]">
-        <aside className="xl:sticky xl:top-28 xl:self-start">
-          <Card className="bg-white">
-            <div className="flex items-center justify-between gap-3">
-              <CardTitle>Workflow sections</CardTitle>
-              <Badge tone="brand">Always visible</Badge>
+      <div className="space-y-5">
+        <div className="rounded-[16px] border border-[var(--line)] bg-white px-4 py-4">
+          <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+            <div className="min-w-0">
+              <h1 className="font-heading text-2xl font-bold text-[var(--heading)]">{pkg.name}</h1>
+              <p className="mt-1 text-sm text-[var(--muted)]">{packageCompletedCount} / {packageTotalCount} tasks complete</p>
             </div>
-            <CardDescription className="mt-2">Navigate the package by team function and jump to active SOP groups.</CardDescription>
-            <div className="mt-5 space-y-2">
-              {visibleSections.map((section) => (
-                <a
-                  key={section.id}
-                  className="block rounded-[16px] border border-[var(--line)] bg-[var(--soft-surface)] px-4 py-3 transition hover:-translate-y-0.5 hover:border-[var(--primary-blue)]/30 hover:bg-white"
-                  href={`#section-${section.id}`}
-                >
-                  <div className="flex items-center justify-between gap-3">
-                    <span className="font-semibold text-[var(--heading)]">{section.name}</span>
-                    <span className="text-sm text-[var(--muted)]">{section.progress}%</span>
-                  </div>
-                  <p className="mt-2 text-sm text-[var(--muted)]">{section.deliverables.length} deliverables</p>
-                </a>
-              ))}
-            </div>
-
-            <div className="mt-5 rounded-[18px] border border-[var(--line)] bg-[linear-gradient(135deg,rgba(102,126,234,0.14),rgba(118,75,162,0.14))] p-4">
-              <div className="flex items-center gap-2 text-[var(--heading)]">
-                <Sparkles className="h-4 w-4" />
-                <p className="text-sm font-semibold">Admin mode available</p>
-              </div>
-              <p className="mt-2 text-sm leading-6 text-[var(--panel-text)]">The content structure is editable from the local admin console whenever SOPs or checklists need to change.</p>
-              <Link className="mt-3 inline-flex text-sm font-semibold text-[var(--primary-blue)]" href="/manage">
-                Open admin mode
-              </Link>
-            </div>
-          </Card>
-        </aside>
-
-        <div className="space-y-6">
-          <Card className="bg-white">
-            <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-              <div>
-                <CardTitle>Main workflow experience</CardTitle>
-                <CardDescription className="mt-2">Search SOPs, filter by role, expand the operating procedure, and track progress as work gets completed.</CardDescription>
-              </div>
-              <div className="flex flex-wrap gap-3">
-                <Link href="/deliverables">
-                  <Button variant="secondary">Open deliverables</Button>
-                </Link>
-                <Link href="/checklists">
-                  <Button variant="secondary">View all checklists</Button>
-                </Link>
-              </div>
-            </div>
-            <div className="mt-5 grid gap-3 lg:grid-cols-[minmax(0,1fr),220px]">
-              <div className="relative">
-                <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--muted)]" />
-                <Input className="pl-11" onChange={(event) => setSearch(event.target.value)} placeholder="Search SOP title, deliverable, category, or purpose" value={search} />
-              </div>
-              <Select onChange={(event) => setRoleFilter(event.target.value)} value={roleFilter}>
+            <div className="flex flex-wrap gap-2">
+              <Input className="w-full md:w-[260px]" onChange={(event) => setSearch(event.target.value)} placeholder="Search SOPs" value={search} />
+              <Select className="md:w-[170px]" onChange={(event) => setRoleFilter(event.target.value)} value={roleFilter}>
                 <option value="all">All roles</option>
                 {roleOptions.map((role) => (
                   <option key={role} value={role}>{role}</option>
                 ))}
               </Select>
             </div>
+          </div>
+          <ProgressBar className="mt-4" value={packageProgress} />
+        </div>
+
+        {visibleSections.map((section) => (
+          <SectionBlock description={section.description} id={section.id} key={section.id} progress={section.progress} title={section.name}>
+            {section.deliverables.map((deliverable) => (
+              <DeliverableGroup
+                completedCount={deliverable.completedCount}
+                description={deliverable.description}
+                key={deliverable.id}
+                progress={deliverable.progress}
+                title={deliverable.title}
+                totalCount={deliverable.totalCount}
+              >
+                {deliverable.sops.map((sop) => (
+                  <SopCard
+                    expanded={expandedSopId === sop.id}
+                    key={sop.id}
+                    onSubtaskToggle={handleSubtaskToggle}
+                    onTaskNoteChange={handleTaskNoteChange}
+                    onTaskToggle={handleTaskToggle}
+                    onToggleExpanded={toggleExpanded}
+                    sop={sop}
+                    state={taskState}
+                  />
+                ))}
+              </DeliverableGroup>
+            ))}
+          </SectionBlock>
+        ))}
+
+        {visibleSections.length === 0 ? (
+          <Card className="bg-white">
+            <CardTitle>No matching SOPs</CardTitle>
+            <CardDescription className="mt-2">Clear the search or role filter to get back to the active workflow.</CardDescription>
           </Card>
+        ) : null}
 
-          {visibleSections.map((section) => (
-            <section className="space-y-4" id={`section-${section.id}`} key={section.id}>
-              <Card className="bg-white">
-                <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-                  <div>
-                    <div className="flex flex-wrap items-center gap-2">
-                      <CardTitle>{section.name}</CardTitle>
-                      <Badge tone="brand">{section.progress}% complete</Badge>
-                    </div>
-                    <CardDescription className="mt-2 max-w-3xl">{section.description}</CardDescription>
-                  </div>
-                  <div className="rounded-[18px] border border-[var(--line)] bg-[var(--soft-surface)] px-4 py-3 text-sm text-[var(--panel-text)]">
-                    <p className="font-semibold">{section.completedCount} of {section.totalCount} tasks complete</p>
-                    <p className="mt-1 text-[var(--muted)]">Grouped by deliverable, then SOP, then step.</p>
-                  </div>
-                </div>
-              </Card>
-
-              {section.deliverables.map((deliverable) => (
-                <div className="space-y-4" key={deliverable.id}>
-                  <Card className="bg-white">
-                    <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-                      <div>
-                        <div className="flex flex-wrap items-center gap-2">
-                          <h3 className="font-heading text-2xl font-bold text-[var(--heading)]">{deliverable.title}</h3>
-                          <Badge tone="neutral">{deliverable.progress}% complete</Badge>
-                        </div>
-                        <p className="mt-2 max-w-3xl text-sm leading-7 text-[var(--muted)]">{deliverable.description}</p>
-                      </div>
-                      <div className="min-w-[180px] rounded-[18px] border border-[var(--line)] bg-[var(--soft-surface)] px-4 py-3">
-                        <div className="flex items-center justify-between gap-3 text-xs font-semibold uppercase tracking-[0.14em] text-[var(--muted)]">
-                          <span>Progress</span>
-                          <span>{deliverable.progress}%</span>
-                        </div>
-                        <div className="mt-3 h-2 rounded-full bg-[var(--soft-surface-deep)]">
-                          <div className="h-2 rounded-full bg-[var(--primary-blue)]" style={{ width: `${deliverable.progress}%` }} />
-                        </div>
-                        <p className="mt-2 text-sm text-[var(--panel-text)]">{deliverable.completedCount} of {deliverable.totalCount} complete</p>
-                      </div>
-                    </div>
-                  </Card>
-
-                  {deliverable.sops.length > 0 ? (
-                    <div className="space-y-3">
-                      {deliverable.sops.map((sop) => (
-                        <SopCard
-                          expanded={Boolean(expanded[sop.id])}
-                          key={sop.id}
-                          onSubtaskToggle={handleSubtaskToggle}
-                          onTaskNoteChange={handleTaskNoteChange}
-                          onTaskToggle={handleTaskToggle}
-                          onToggleExpanded={toggleExpanded}
-                          sop={sop}
-                          state={taskState}
-                        />
-                      ))}
-                    </div>
-                  ) : (
-                    <Card className="border-dashed bg-[var(--soft-surface)]">
-                      <CardTitle>No SOPs mapped yet</CardTitle>
-                      <CardDescription className="mt-2">This deliverable exists in the package, but no SOP has been attached yet. You can add one from admin mode.</CardDescription>
-                    </Card>
-                  )}
-                </div>
-              ))}
-            </section>
-          ))}
-
-          {visibleSections.length === 0 ? (
-            <Card className="bg-white">
-              <div className="flex items-center gap-3 text-[var(--heading)]">
-                <ShieldCheck className="h-5 w-5 text-[var(--primary-blue)]" />
-                <CardTitle>No SOPs match the current filters</CardTitle>
-              </div>
-              <CardDescription className="mt-2">Try clearing the search, switching role filters, or add more SOPs in admin mode.</CardDescription>
-            </Card>
-          ) : null}
+        <div className="flex gap-3 text-sm">
+          <Link className="font-semibold text-[var(--primary-blue)]" href="/checklists">All checklists</Link>
+          <Link className="font-semibold text-[var(--primary-blue)]" href="/manage">Admin mode</Link>
         </div>
       </div>
     </div>

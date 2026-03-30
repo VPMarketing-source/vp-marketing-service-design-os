@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { Textarea } from "@/components/ui/textarea";
 
@@ -33,54 +33,48 @@ export function WorkflowChecklistItem({
   onSubtaskToggle
 }: WorkflowChecklistItemProps) {
   return (
-    <div className="rounded-[18px] border border-[var(--line)] bg-white p-4 shadow-[var(--shadow)]">
-      <label className="flex items-start gap-3">
+    <div className="rounded-xl border border-[var(--line)] bg-white px-3 py-3" id={`task-${itemId}`}>
+      <div className="flex items-start gap-3">
         <input
           checked={checked}
           className="mt-1 h-4 w-4 rounded border-[var(--line)] text-[var(--primary-blue)] focus:ring-[var(--primary-blue)]"
           onChange={(event) => onToggle(itemId, event.target.checked)}
           type="checkbox"
         />
-        <div className="flex-1">
+        <div className="min-w-0 flex-1">
           <div className="flex flex-col gap-1 md:flex-row md:items-start md:justify-between">
-            <div>
-              <p className="font-semibold text-[var(--heading)]">{title}</p>
+            <div className="min-w-0">
+              <p className="text-sm font-medium text-[var(--heading)]">{title}</p>
               {description ? <p className="mt-1 text-sm leading-6 text-[var(--muted)]">{description}</p> : null}
             </div>
-            <span className="rounded-full bg-[var(--soft-surface)] px-2.5 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-[var(--panel-text)]">
-              {checked ? "Done" : "Open"}
-            </span>
+            <span className="text-xs text-[var(--muted)]">{checked ? "Done" : "Open"}</span>
           </div>
 
           {subtasks.length > 0 ? (
-            <div className="mt-4 rounded-[16px] border border-[var(--line)] bg-[var(--soft-surface)] p-3">
-              <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--muted)]">Nested subtasks</p>
-              <div className="mt-3 space-y-2">
-                {subtasks.map((subtask) => (
-                  <label key={subtask.id} className="flex items-center gap-3 text-sm text-[var(--panel-text)]">
-                    <input
-                      checked={Boolean(subtaskState[subtask.id])}
-                      className="h-4 w-4 rounded border-[var(--line)] text-[var(--primary-blue)] focus:ring-[var(--primary-blue)]"
-                      onChange={(event) => onSubtaskToggle?.(itemId, subtask.id, event.target.checked)}
-                      type="checkbox"
-                    />
-                    <span>{subtask.title}</span>
-                  </label>
-                ))}
-              </div>
+            <div className="mt-3 space-y-2 border-l border-[var(--line)] pl-4">
+              {subtasks.map((subtask) => (
+                <label key={subtask.id} className="flex items-center gap-2 text-sm text-[var(--panel-text)]">
+                  <input
+                    checked={Boolean(subtaskState[subtask.id])}
+                    className="h-4 w-4 rounded border-[var(--line)] text-[var(--primary-blue)] focus:ring-[var(--primary-blue)]"
+                    onChange={(event) => onSubtaskToggle?.(itemId, subtask.id, event.target.checked)}
+                    type="checkbox"
+                  />
+                  <span>{subtask.title}</span>
+                </label>
+              ))}
             </div>
           ) : null}
 
-          <div className="mt-4">
-            <Textarea
-              className="min-h-[96px]"
-              onChange={(event) => onNoteChange(itemId, event.target.value)}
-              placeholder="Add notes, blockers, or handoff context"
-              value={note}
-            />
-          </div>
+          <Textarea
+            className="mt-3 min-h-[78px] rounded-xl"
+            onChange={(event) => onNoteChange(itemId, event.target.value)}
+            placeholder="Notes"
+            value={note}
+          />
         </div>
-      </label>
+      </div>
     </div>
   );
 }
+
